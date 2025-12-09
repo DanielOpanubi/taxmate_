@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+minio
+psycopg2-binary
+sqlalchemy
+alembic        # optional for migrations
+pytest
+httpx
