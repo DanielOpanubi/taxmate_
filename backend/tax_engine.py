@@ -13,3 +13,4 @@ def calculate_tax(income: float, deductions: float) -> dict:
         "taxable_income": taxable_income,
         "tax": tax
     }
+
