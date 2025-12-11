@@ -1,15 +1,22 @@
-def calculate_tax(income: float, deductions: float) -> dict:
-    taxable_income = max(income - deductions, 0)
+def calculate_tax(income: float, deductions: float):
+    # sanitize
+    income = float(max(income, 0))
+    deductions = float(max(deductions, 0))
+    taxable = max(income - deductions, 0)
 
-    # Example progressive rate (replace with real rules)
-    if taxable_income <= 300000:
-        tax = taxable_income * 0.07
-    elif taxable_income <= 600000:
-        tax = 300000 * 0.07 + (taxable_income - 300000) * 0.11
-    else:
-        tax = 300000 * 0.07 + 300000 * 0.11 + (taxable_income - 600000) * 0.15
+    # Example progressive rates — replace with official formulas
+    tax = 0.0
+    remaining = taxable
+    brackets = [
+        (300000, 0.07),
+        (300000, 0.11),
+        (float("inf"), 0.15)
+    ]
+    for limit, rate in brackets:
+        part = min(remaining, limit)
+        tax += part * rate
+        remaining -= part
+        if remaining <= 0:
+            break
 
-    return {
-        "taxable_income": taxable_income,
-        "tax": tax
-    }
+    return {"income": income, "deductions": deductions, "taxable_income": taxable, "tax": round(tax, 2)}
