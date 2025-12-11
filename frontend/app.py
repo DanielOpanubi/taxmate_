@@ -1,7 +1,8 @@
 import streamlit as st
 import requests
+import os
 
-API_URL = st.secrets.get("API_URL", "http://backend:8000")
+API_URL = os.getenv("API_URL", "http://backend:8000")
 
 st.title("Tax Calculator & Invoice Upload")
 
@@ -22,14 +23,21 @@ if menu == "Tax Calculator":
 if menu == "Upload Invoice":
     st.header("Upload an invoice (PDF/JPG/PNG)")
     uploaded_file = st.file_uploader("Choose a file", type=["pdf", "png", "jpg", "jpeg"])
-    business_id = st.text_input("Business ID (optional)")
+    business_id = st.text_input("Business ID (required)")
+    
     if uploaded_file:
-        if st.button("Upload"):
-            files = {"file": (uploaded_file.name, uploaded_file.getvalue())}
-            data = {"business_id": business_id}
-            resp = requests.post(f"{API_URL}/upload_invoice", files=files, data=data)
+        if not business_id.strip():
+            st.warning("Business ID is required to upload a file.")
+        else:
+            # Send file and business_id to backend
+            file_tuple = (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)
+            resp = requests.post(
+                f"{API_URL}/upload_invoice",
+                files={"file": file_tuple},
+                data={"business_id": business_id}
+            )
             if resp.ok:
-                st.success("Uploaded")
+                st.success("Uploaded!")
                 st.json(resp.json())
             else:
-                st.error(resp.text)
+                st.error(f"Error {resp.status_code}: {resp.text}")
